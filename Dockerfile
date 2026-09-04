@@ -8,12 +8,13 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Copy the dependency files first to cache them
 COPY pyproject.toml uv.lock ./
 
-# Install the dependencies in frozen mode to ensure reproducibility
-RUN uv sync --frozen
-
-# Copy the rest of the application files
+# Copy the rest of the application files before running uv sync 
+# (uv sync tries to install the local package, so the source must be present)
 COPY src/ ./src/
 COPY main.py ./
+
+# Install the dependencies in frozen mode to ensure reproducibility
+RUN uv sync --frozen
 
 # Expose the API port
 EXPOSE 8000

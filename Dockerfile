@@ -12,6 +12,7 @@ COPY pyproject.toml uv.lock ./
 # (uv sync tries to install the local package, so the source must be present)
 COPY src/ ./src/
 COPY main.py ./
+COPY README.md ./
 
 # Install the dependencies in frozen mode to ensure reproducibility
 RUN uv sync --frozen

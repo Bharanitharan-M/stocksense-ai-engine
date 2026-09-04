@@ -16,6 +16,10 @@ app = FastAPI(
 
 app.include_router(engine_router)
 
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "StockSense AI Engine is running"}
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": settings.APP_NAME}

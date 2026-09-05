@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 import httpx
 import logging
+import os
 
 from src.pipelines.ai_engine import run_full_pipeline, run_discovery_pipeline
 from src.models.schemas import AIAnalysisResponse, DiscoveryOutput
@@ -40,7 +41,8 @@ def process_discovery_background(query: str, user_emails: List[str], top_url: st
         payload["top_url"] = top_url
         
         # Call Java Webhook
-        webhook_url = "http://localhost:8080/api/v1/internal/webhook/insight-result"
+        base_url = os.getenv("JAVA_BACKEND_URL", "https://stocksense-backend-3w34.onrender.com")
+        webhook_url = f"{base_url}/api/v1/internal/webhook/insight-result"
         with httpx.Client(timeout=30.0) as client:
             client.post(webhook_url, json=payload)
             logger.info(f"Successfully sent async discovery result to Java for {query}")
@@ -56,7 +58,9 @@ def process_discovery_background(query: str, user_emails: List[str], top_url: st
                 "relevance_outcome": "NOT_RELEVANT"
             }
             with httpx.Client(timeout=30.0) as client:
-                client.post("http://localhost:8080/api/v1/internal/webhook/insight-result", json=payload)
+                base_url = os.getenv("JAVA_BACKEND_URL", "https://stocksense-backend-3w34.onrender.com")
+                webhook_url = f"{base_url}/api/v1/internal/webhook/insight-result"
+                client.post(webhook_url, json=payload)
         except Exception:
             pass
 
